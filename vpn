@@ -1,0 +1,5 @@
+[vpn]
+public.novelpay.pl 
+[vpn:vars]
+ansible_port=22245
+ansible_user=kamil

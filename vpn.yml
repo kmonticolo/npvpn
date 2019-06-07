@@ -1,0 +1,83 @@
+---
+- hosts: vpn
+  become: yes
+  vars: 
+    tunnel_endpoint: 217.73.38.100
+    strongswan_config_file:  "{{strongswan_prefix}}/ipsec.conf"
+    strongswan_secrets_file: "{{strongswan_prefix}}/ipsec.secrets"
+    strongswan_config_setup:
+      uniqueids: 'yes'
+      charondebug: ''
+    strongswan_conn_default:
+      type: tunnel
+      ikelifetime: 4h
+      lifetime: 1h
+      left: "{{ ansible_default_ipv4.address }}"
+    strongswan_conns:
+      conn1:
+        right: "{{ tunnel_endpoint }}"
+        rightsubnet: 170.186.104.0/24
+        leftsubnet: 10.17.23.48/29
+        authby: psk
+        ike: aes128ccm8-sha256-ecp256
+        esp: aes128-sha256-ecp256
+        auto: start
+    strongswan_secrets:
+      - left: "{{ ansible_default_ipv4.address }}"
+        right: "{{ tunnel_endpoint }}"
+        type: PSK
+        credentials: "change_me"
+
+  pre_tasks:
+    - name: Install packages
+      apt: 
+        name: "{{ item }}"
+        update_cache: yes
+      loop:
+      - aptitude
+      - iptables-persistent
+
+  roles:
+     - { role: torian.strongswan }
+  
+  tasks:
+    - name: Insert iptables SNAT entry for gerrit
+      iptables:
+        table: nat
+        chain: POSTROUTING
+        out_interface: "{{ ansible_default_ipv4.interface }}"
+        protocol: tcp
+        match: tcp
+        source: 192.168.0.32
+        destination: "{{ item }}"
+        destination_port: '29418'
+        jump: SNAT
+        to_source: 10.17.23.49
+        comment: gerrit FD
+      become: yes
+      loop:
+      - 170.186.104.183
+      - 170.186.105.175
+      register: iptables
+
+    - name: Save iptables if there is a change
+      shell: "/sbin/iptables-save > /etc/iptables/rules.v4"
+      when: 
+      - iptables is changed
+
+    - name: Run ipsec status
+      command: ipsec status
+      register: ipsec_status
+      changed_when: no
+
+    - name: Restart ipsec service
+      service:
+        name: ipsec
+        state: restarted
+      when: '"ESTABLISHED" not in ipsec_status.stdout'
+
+    - name: Check ipsec status
+      assert:
+        that:
+          - '"ESTABLISHED" in ipsec_status.stdout'
+          - '"INSTALLED" in ipsec_status.stdout'
