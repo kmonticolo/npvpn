@@ -6,6 +6,7 @@
     tunnel_endpoint: 217.73.38.100
     gerrit_ip: 192.168.0.32
     gerrit_port: '29418'
+    gerrit_snat_ip: 10.17.23.49
     strongswan_config_file:  "{{strongswan_prefix}}/ipsec.conf"
     strongswan_secrets_file: "{{strongswan_prefix}}/ipsec.secrets"
     strongswan_config_setup:
@@ -55,7 +56,7 @@
         destination: "{{ item }}"
         destination_port: "{{ gerrit_port }}"
         jump: SNAT
-        to_source: 10.17.23.49
+        to_source: "{{ gerrit_snat_ip }}"
         comment: gerrit FD
       become: yes
       loop:
