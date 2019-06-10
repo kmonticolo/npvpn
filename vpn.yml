@@ -4,6 +4,8 @@
   vars_files: vault_psk.yml
   vars: 
     tunnel_endpoint: 217.73.38.100
+    gerrit_ip: 192.168.0.32
+    gerrit_port: '29418'
     strongswan_config_file:  "{{strongswan_prefix}}/ipsec.conf"
     strongswan_secrets_file: "{{strongswan_prefix}}/ipsec.secrets"
     strongswan_config_setup:
@@ -49,9 +51,9 @@
         out_interface: "{{ ansible_default_ipv4.interface }}"
         protocol: tcp
         match: tcp
-        source: 192.168.0.32
+        source: "{{ gerrit_ip }}"
         destination: "{{ item }}"
-        destination_port: '29418'
+        destination_port: "{{ gerrit_port }}"
         jump: SNAT
         to_source: 10.17.23.49
         comment: gerrit FD
