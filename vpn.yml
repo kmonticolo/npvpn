@@ -1,6 +1,7 @@
 ---
 - hosts: vpn
   become: yes
+  vars_files: vault_psk.yml
   vars: 
     tunnel_endpoint: 217.73.38.100
     strongswan_config_file:  "{{strongswan_prefix}}/ipsec.conf"
