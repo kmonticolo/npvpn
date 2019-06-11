@@ -80,6 +80,11 @@
         state: restarted
       when: '"ESTABLISHED" not in ipsec_status.stdout'
 
+    - name: Add cron job for ipsec restart
+      cron:
+        name: "ipsec restart"
+        job: "{{ strongswan_ipsec_bin }} status|grep -q ESTABLISHED || {{ strongswan_ipsec_bin }} restart"
+
     - name: Check ipsec status
       assert:
         that:
