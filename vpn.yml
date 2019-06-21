@@ -85,8 +85,13 @@
         name: "ipsec restart"
         job: "{{ strongswan_ipsec_bin }} status|grep -q ESTABLISHED || {{ strongswan_ipsec_bin }} restart"
 
+    - name: Run ipsec status
+      command: ipsec status
+      register: ipsec_status2
+      changed_when: no
+
     - name: Check ipsec status
       assert:
         that:
-          - '"ESTABLISHED" in ipsec_status.stdout'
-          - '"INSTALLED" in ipsec_status.stdout'
+          - '"ESTABLISHED" in ipsec_status2.stdout'
+          - '"INSTALLED" in ipsec_status2.stdout'
