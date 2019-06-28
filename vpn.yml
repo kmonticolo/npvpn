@@ -47,8 +47,8 @@
       - iptables-persistent
 
   roles:
-     - { role: torian.strongswan }
-     - { role: dj-wasabi.zabbix-agent}
+     - { role: kmonticolo.ansible_role_strongswan }
+     - { role: dj-wasabi.zabbix-agent }
   
   tasks:
     - name: Insert iptables SNAT entry for gerrit
