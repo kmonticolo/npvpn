@@ -5,8 +5,8 @@
   vars: 
     # zabbix vars
     zabbix_agent_server: 127.0.0.1,miki.artifact.pl,164.132.63.48
-    sign_keys: 34
-    zabbix_version: 3.4
+    sign_keys: 42
+    zabbix_version: 4.2
     # ipsec vars
     tunnel_endpoint: 217.73.38.100
     gerrit_ip: 192.168.0.32
