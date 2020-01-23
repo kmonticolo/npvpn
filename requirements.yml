@@ -1,3 +1,5 @@
 ---
 # ipsec role
 - src: kmonticolo.ansible_role_strongswan
+# zabbix agent role
+- src: dj-wasabi.zabbix-agent
